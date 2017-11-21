@@ -922,7 +922,60 @@
     </Parse>
     <Resource Id="Fail"/>
   </RestConnector>
-
+  
+ <RestConnector Id="UrlOrganicSearchKeywords2" Title="URL Organic Search Keywords 2" HelpUrl="https://www.semrush.com/api-analytics/#url_organic" HelpText="Lists keywords that bring users to a URL via Google's top 20 organic search results.">
+    <Parameters>
+      <Text Id="Url" Title="URL" Debug.DefaultValue="http://nintendo.com" Required="true" HelpUrl=""/>
+      <Resource Id="SelectDatabase"/>
+      <Number Id="MaxResults" Title="Max Results" DefaultValue="100" Required="false" HelpText="Number of rows to be returned back"/>
+    </Parameters>
+    <Fetch>
+      <Fetch.Url>
+        <![CDATA[
+        http://api.semrush.com/?
+        type=url_organic
+        &url=@Utils.UrlEncode(Model.Url)
+        &database=@Utils.UrlEncode(Model.Database)
+        &key=@Model.ApiKey
+        &export_columns=@Model.Fields
+        &display_limit=@Model.MaxResults
+        @if(!Utils.IsNullDate(Model.DisplayDate))
+        {
+          @: &display_date=@Model.DisplayDate.AddDays(15 - Model.DisplayDate.Day).ToString("yyyyMMdd")
+        }
+      @if(Model.Sort != "default")
+        {
+          @: &display_sort=@Model.Sort
+        }
+        @if(Model.KeywordType != "all")
+        {
+          @: &display_positions=@Model.KeywordType
+        }
+        ]]>
+      </Fetch.Url>
+      <RequestHeaders>
+        <Header Name='User-Agent'>seotools-for-excel</Header>
+      </RequestHeaders>
+    </Fetch>
+    <Parse>
+      <Csv Separator=";" HasHeader="true">
+        <Field Id="Ph" Title="Keyword" Tag="Keyword" Converter="String" Checked="true" HelpText="Keyword bringing users to the website via Google's top 20 organic search results."/>
+        <Field Id="Po" Title="Position" Tag="Position" Converter="Int" Checked="true" HelpText="Position a URL gets with a particular keyword in Google's top 20 organic or paid search results."/>
+        <Field Id="Nq" Title="Search Volume" Tag="Search Volume" Converter="Int" Checked="true" HelpText="The average number of times users have searched for a given keyword per month. We calculate this value over the last 12 months."/>
+        <Field Id="Cp" Title="CPC" Tag="CPC" Converter="Int" Checked="true" HelpText="Average price in US dollars advertisers pay for a user's click on an ad containing a particular keyword (Google AdWords)."/>
+        <Field Id="Co" Title="Traffic Cost (%)" Tag="Traffic Cost (%)" Converter="Double" Checked="true" HelpText="Competitive density of advertisers using the given term for their ads. One (1) means the highest competition."/>
+        <Field Id="Tr" Title="Traffic (%)" Tag="Traffic (%)" Converter="Double" Checked="true" HelpText="The share of traffic driven to the website with a particular keyword for a specified period."/>
+        <Field Id="Tc" Title="Competition" Tag="Competition" Converter="Double" Checked="true" HelpText="The total amount spent on keywords in Google AdWords for which the domain is ranking in search results."/>
+        <Field Id="Nr" Title="Number of Results" Tag="Number of Results" Converter="Int" Checked="true" HelpText="The total number of organic results returned for a given keyword at the last date of collection."/>
+        <Field Id="Td" Title="Trends" Tag="Trends" Converter="String" Checked="true" HelpText="The interest of searchers in a particular keyword during the last 12 months. This metric is based on changes in the number of queries per month."/>
+        <Field Id="Hs" Title="Historical" Tag="Historical" Converter="String" Checked="true" HelpText="Is this data historical?"/>
+      </Csv>
+    </Parse>
+    <Resource Id="Fail"/>
+  </RestConnector>
+  
+  
+  
   <RestConnector Id="UrlPaidSearchKeywords" Title="URL Paid Search Keywords" HelpUrl="https://www.semrush.com/api-analytics/#url_adwords" HelpText="Lists keywords that bring users to a URL via Google's top 20 paid search results.">
     <Parameters>
       <Text Id="Url" Title="URL" Debug.DefaultValue="http://nintendo.com" Required="true" HelpUrl=""/>
